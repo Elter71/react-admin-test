@@ -1,33 +1,54 @@
-type Character = {
-    id:      number;
-    name:    string;
-    status:  string;
-    image: string;
-};
 type CharacterApiModel =  {
-    id:      number;
-    name:    string;
-    status:  string;
-    species: string;
-    type:    string;
-    gender:  string;
-    origin:  Origin;
-    image: string;
-    episodes: string[]
-    url: string;
-    created: string;
+    id:       number;
+    name:     string;
+    status:   string;
+    species:  string;
+    type:     string;
+    gender:   string;
+    origin:   LocationApiModel;
+    location: LocationApiModel;
+    image:    string;
+    episode:  string[];
+    url:      string;
+    created:  Date;
 }
-type Origin = {
+type LocationApiModel = {
     name: string;
     url:  string;
 }
 
-export default Character;
+type Character =  {
+    id:       number;
+    name:     string;
+    status:   string;
+    species:  string;
+    type:     string;
+    gender:   string;
+    origin:   Location;
+    location: Location;
+    image:    string;
+    episode:  string[];
+    url:      string;
+    created:  Date;
+}
 
+type Location = {
+    id: string;
+    name: string;
+    url:  string;
+}
 
-export const mapCharacterApiModelToCharacter = (model: CharacterApiModel): Character => ({
-    id: model.id,
-    name: model.name,
-    status: model.status,
-    image: model.image
+export const mapCharacter = (model: CharacterApiModel) => ({
+    ...model,
+    origin: mapLocation(model.origin),
+    location: mapLocation(model.location)
 })
+
+const mapLocation = (model: LocationApiModel) => ({
+    ...model,
+    id: model.url.replace('https://rickandmortyapi.com/api/location/', '')
+})
+
+
+
+export default Character;

@@ -1,7 +1,16 @@
 import jsonServerProvider from 'ra-data-json-server';
 import {fetchUtils, DataProvider} from "ra-core";
 import {stringify} from "querystring";
-import {mapCharacterApiModelToCharacter} from "../models/Character";
+import {mapCharacter} from "../models/Character";
+
+const resourceMapper = (resource: string) => (model: any) => {
+    switch (resource) {
+        case 'character':
+            return mapCharacter(model);
+        default:
+            return model;
+    }
+}
 
 const dataProvider = (apiUrl: any, httpClient = fetchUtils.fetchJson): DataProvider =>  ({
         ...jsonServerProvider(apiUrl, httpClient),
@@ -26,11 +35,16 @@ const dataProvider = (apiUrl: any, httpClient = fetchUtils.fetchJson): DataProvi
                         );
                     }
                     return {
-                        data: json.results.map(mapCharacterApiModelToCharacter),
+                        data: json.results.map(resourceMapper(resource)),
                         total: json.info.count
                     };
                 });
             },
+    getMany: (resource, params) => {
+            const idsAsStrings = params.ids.join(',')
+        const url = `${apiUrl}/${resource}/${idsAsStrings}`;
+        return httpClient(url).then(({ json }) => ({ data: json }));
+    },
 })
 
 export default dataProvider;
